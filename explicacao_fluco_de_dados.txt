@@ -1,0 +1,67 @@
+
+1. Cliente (Frontend)
+O cliente (navegador ou aplicativo) faz a requisição para o servidor. O que acontece no fluxo é o seguinte:
+
+Requisição de POST para /posts
+O cliente envia uma requisição POST para o endpoint /posts, geralmente com dados em formato JSON no corpo da requisição.
+Esse POST pode ser feito por meio de um formulário ou via JavaScript (como com fetch ou axios).
+
+Requisição de POST para /upload
+O cliente também pode fazer upload de um arquivo (imagem) através do formulário. Aqui, o cliente envia uma requisição POST para o endpoint /upload, incluindo o arquivo no corpo da requisição.
+O campo no formulário que contém o arquivo é identificado como "imagem", e esse arquivo será processado pelo servidor.
+
+2. Rota (routes.js) - Recebe e direciona as requisições
+No servidor, o arquivo routes.js é responsável por definir as rotas e associar cada uma delas a um controlador (as funções que processam as requisições).
+
+O arquivo define as rotas que o servidor irá responder, como /posts e /upload.
+
+Processamento da Requisição
+Quando o cliente faz uma requisição para o endpoint /posts ou /upload, o Express (framework de servidor) vai chamar o controlador correspondente.
+Exemplo: Se o cliente envia dados para criar um post (requisição POST para /posts), o Express vai chamar a função postarNovoPost no controller (arquivo postsController.js).
+
+3. Controller (postsController.js) - Controla a lógica de negócios
+Os controllers são responsáveis por executar a lógica de negócios necessária para processar a requisição. Eles não lidam diretamente com as rotas, mas sim com a manipulação dos dados recebidos e a interação com o banco de dados.
+
+Fluxo para o Controller de Criação de Post
+POST /posts: O cliente envia um POST para /posts, com dados como título e conteúdo de um post.
+O controller postarNovoPost recebe esses dados e usa a função criarPost para gravar esse post no banco de dados.
+Se o processo for bem-sucedido, o controlador envia uma resposta de sucesso com o post criado. Caso haja erro, ele retorna um erro com status 500.
+
+Fluxo para o Controller de Upload de Imagem
+POST /upload: O cliente envia uma requisição POST para /upload com um arquivo de imagem.
+O controlador uploadImagem lida com a imagem recebida através do multer.
+O arquivo é renomeado (com o ID gerado para o post) e movido para a pasta uploads/ no servidor.
+O controlador então cria um novo post associando a imagem ao banco de dados e retorna uma resposta com o post criado.
+
+4. Modelo (postsModel.js) - Interage com o Banco de Dados
+Os modelos são responsáveis pela interação com o banco de dados. Eles contêm funções que ajudam a criar, ler, atualizar ou excluir registros no banco.
+
+Funções no Modelo
+criarPost: Quando o controller chama criarPost(novoPost), essa função interage com o banco de dados (usando um ORM ou comandos SQL diretamente) para inserir um novo post.
+getTodosPosts: Esta função busca todos os posts no banco de dados, o que é usado quando a requisição GET é feita para listar posts.
+
+Fluxo Completo do Sistema (do cliente para o servidor)
+Cliente envia dados:
+O cliente envia dados via requisição POST para criar um novo post ou fazer o upload de uma imagem.
+
+Rota no servidor:
+O Express (framework de servidor) recebe a requisição e a direciona para a função correta no controlador (controller).
+
+Controlador processa dados:
+O controlador lida com os dados recebidos, seja criando um post, associando uma imagem, ou retornando a resposta apropriada.
+
+Modelo interage com o banco de dados:
+O controlador chama funções do modelo para realizar ações no banco de dados, como inserir o post criado ou listar os posts.
+
+Resposta ao cliente:
+O servidor envia a resposta de volta para o cliente, seja um post criado ou uma lista de posts.
+
+Processamento de imagem (uploadImagem):
+Quando uma imagem é carregada, o multer salva o arquivo temporariamente, e o controlador usa a função fs.renameSync() para mover e renomear o arquivo para o diretório uploads/.
+O caminho da imagem é então associado ao novo post no banco de dados.
+
+Resumo:
+Cliente: Envia uma requisição POST (com dados ou arquivo) para o servidor.
+Rota: O Express recebe e direciona a requisição para a função apropriada no controller.
+Controller: Processa a lógica de criação de post ou upload de imagem, interagindo com o modelo.
+Modelo: Realiza operações no banco de dados, como salvar ou buscar posts.
